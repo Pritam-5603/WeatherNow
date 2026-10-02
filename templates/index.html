@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Weather App</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+    <main class="app-container">
+
+        <!-- Header -->
+        <section class="header">
+
+            <p class="subtitle">CURRENT WEATHER</p>
+
+            <h1>Weather<span>Now</span></h1>
+
+            <p class="description">
+                Search for any city and get its latest weather information.
+            </p>
+
+        </section>
+
+
+        <!-- Search -->
+        <form class="search-form">
+
+            <div class="search-box">
+
+                <span class="search-icon">⌕</span>
+
+                <input
+                    type="text"
+                    name="city"
+                    placeholder="Enter city name..."
+                    autocomplete="off"
+                    required
+                >
+
+                <button type="submit" id="search-button">
+                    <span id="button-text">Search</span>
+                    <span id="loading-spinner" class="hidden">◌</span>
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <!-- Dynamic Error Message -->
+        <div id="error-message" class="error-message hidden">
+
+            <span>⚠</span>
+
+            <span id="error-text"></span>
+
+        </div>
+
+
+        <!-- Server Error Message -->
+        {% if error %}
+
+            <div class="error-message">
+
+                <span>⚠</span>
+
+                {{ error }}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- Weather Card -->
+        <section
+            id="weather-card"
+            class="weather-card {% if not weather %}hidden{% endif %}"
+        >
+
+            <!-- Location -->
+            <div class="location">
+
+                <span class="location-icon">⌖</span>
+
+                <div>
+
+                    <h2 id="city-name">
+
+                        {% if weather %}
+                            {{ weather["name"] }}
+                        {% else %}
+                            Search a city
+                        {% endif %}
+
+                    </h2>
+
+                    <span id="country">
+
+                        {% if weather %}
+                            {{ weather["sys"]["country"] }}
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- Main Weather -->
+            <div class="main-weather">
+
+                <div class="temperature">
+
+                    <span id="temperature">
+
+                        {% if weather %}
+                            {{ weather["main"]["temp"]|round|int }}
+                        {% else %}
+                            --
+                        {% endif %}
+
+                    </span>
+
+                    <span id="unit">°C</span>
+
+                </div>
+
+
+                <button id="unit-toggle" type="button">
+                    °F
+                </button>
+
+
+                <div class="weather-condition">
+
+                    <img
+                        id="weather-icon"
+
+                        {% if weather %}
+                            src="https://openweathermap.org/img/wn/{{ weather['weather'][0]['icon'] }}@2x.png"
+                        {% endif %}
+
+                        alt="Weather icon"
+                    >
+
+                    <p id="weather-description">
+
+                        {% if weather %}
+                            {{ weather["weather"][0]["description"] }}
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Weather Details -->
+            <div class="weather-details">
+
+
+                <!-- Feels Like -->
+                <div class="detail">
+
+                    <div class="detail-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M14 14.76V5a2 2 0 0 0-4 0v9.76a4 4 0 1 0 4 0Z"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+
+                            <path
+                                d="M12 13V6"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+
+                    </div>
+
+                    <div>
+
+                        <span class="detail-label">
+                            Feels Like
+                        </span>
+
+                        <strong id="feels-like">
+
+                            {% if weather %}
+                                {{ weather["main"]["feels_like"]|round|int }}°C
+                            {% else %}
+                                --°C
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Humidity -->
+                <div class="detail">
+
+                    <div class="detail-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M12 3s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11Z"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+
+                    </div>
+
+                    <div>
+
+                        <span class="detail-label">
+                            Humidity
+                        </span>
+
+                        <strong id="humidity">
+
+                            {% if weather %}
+                                {{ weather["main"]["humidity"] }}%
+                            {% else %}
+                                --%
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Wind -->
+                <div class="detail">
+
+                    <div class="detail-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                d="M3 8h11a3 3 0 1 0-3-3"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                            />
+
+                            <path
+                                d="M3 12h15"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                            />
+
+                            <path
+                                d="M3 16h9a3 3 0 1 1-3 3"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                stroke-linecap="round"
+                            />
+                        </svg>
+
+                    </div>
+
+                    <div>
+
+                        <span class="detail-label">
+                            Wind
+                        </span>
+
+                        <strong id="wind-speed">
+
+                            {% if weather %}
+                                {{ weather["wind"]["speed"] }} m/s
+                            {% else %}
+                                -- m/s
+                            {% endif %}
+
+                        </strong>
+
+                        <small id="wind-direction">
+
+                            {% if weather %}
+                                {{ weather["wind"]["deg"] }}°
+                            {% endif %}
+
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Pressure -->
+                <div class="detail">
+
+                    <div class="detail-icon">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <circle
+                                cx="12"
+                                cy="12"
+                                r="7"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                            />
+
+                            <circle
+                                cx="12"
+                                cy="12"
+                                r="2.5"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                            />
+                        </svg>
+
+                    </div>
+
+                    <div>
+
+                        <span class="detail-label">
+                            Pressure
+                        </span>
+
+                        <strong id="pressure">
+
+                            {% if weather %}
+                                {{ weather["main"]["pressure"] }} hPa
+                            {% else %}
+                                -- hPa
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Footer -->
+        <footer>
+            Weather data powered by OpenWeather
+        </footer>
+
+    </main>
+
+
+    <script
+        src="{{ url_for('static', filename='js/script.js') }}"
+    ></script>
+
+</body>
+
+</html>
